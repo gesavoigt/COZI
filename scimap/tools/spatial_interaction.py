@@ -343,10 +343,11 @@ Example:
             p_values = p_values[~np.isnan(p_values)].values
 
         if pval_method == 'zscore':
-            z_scores = (n_freq.values - mean) / std        
+            z_scores = ( (n_freq.values - mean) / std ) / np.sqrt( adata_subset.shape[0] ) # z-score, scaled by sqrt(n_cells per imageid)      
             z_scores[np.isnan(z_scores)] = 0
             p_values = scipy.stats.norm.sf(abs(z_scores))*2
             p_values = p_values[~np.isnan(p_values)]
+            z_scores.replace([np.inf, -np.inf], np.nan, inplace=True)
 
         # Compute Direction of interaction (interaction or avoidance)
         direction = ((n_freq.values - mean) / abs(n_freq.values - mean)).fillna(1)
